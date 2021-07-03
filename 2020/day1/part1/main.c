@@ -17,8 +17,9 @@
 
 int main (void)
 {
-    FILE *file_pointer, *loop_pointer;
-    int first_number, second_number;
+    FILE *file_pointer;
+    int *number_list, sum;
+    unsigned int list_counter = 1;
 
     // opening puzzle input and checking error
     file_pointer = fopen(TEXT_INPUT, TEXT_MODE);
@@ -27,19 +28,38 @@ int main (void)
         exit(1);
     }
 
-    // check how many numbers there are and malloc the needed amount
-    while (fscanf(file_pointer, "%i", &first_number) != EOF) {
-        loop_pointer = fopen(TEXT_INPUT, TEXT_MODE);
-        while (fscanf(loop_pointer, "%i", &second_number) != EOF) {
-            // check numbers
-            if ((first_number + second_number) == 2020) {
-                printf("%i * %i = %i\n", first_number, second_number, first_number * second_number);
-            }
+    // create an array based on the input
+    for (char buf = getc(file_pointer); buf != EOF; buf = getc(file_pointer)) {
+        if (buf == '\n') {
+            list_counter++;
         }
     }
 
+    // reset file pointer
+    fseek(file_pointer, 0, SEEK_SET);
+
+    // set the array full of puzzle input values
+    number_list = (int *) malloc(sizeof(int) * list_counter);
+    for (int i = 0; i < list_counter; i++) {
+        fscanf(file_pointer, "%i", &number_list[i]);
+    }
+
+    // find the product and sum
+    for (int i = 0; i < list_counter; i++) {
+        for (int j = 0; j < list_counter; j++) {
+            sum = number_list[i] + number_list[j];
+            if (sum == 2020) {
+                printf("%i * %i = %i\n", number_list[i], number_list[j], number_list[i] * number_list[j]);
+
+                break;
+            }
+        }
+        if (sum == 2020) break;
+    }
+
+    // close file and free dynamic memory
+    free(number_list);
     fclose(file_pointer);
-    fclose(loop_pointer);
 
     return 0;
 }
